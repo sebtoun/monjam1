@@ -20,7 +20,7 @@ public class RotateTowardsTarget : MonoBehaviour
     {
 
         var targetOrientation = _target.position - transform.position;
-        var targetAngle = Mathf.Atan2(targetOrientation.y, targetOrientation.x) * Mathf.Rad2Deg + 90;
+        var targetAngle = Mathf.Atan2(targetOrientation.y, targetOrientation.x) * Mathf.Rad2Deg - 90;
         _currentOrientation = Mathf.SmoothDampAngle(_currentOrientation, targetAngle, ref _angularVelocity, Inertia);
     }
 
