@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 [RequireComponent( typeof( MobileEntity ) )]
+[ExecutionOrder( "Intent" )]
 public class RushTarget : MonoBehaviour 
 {
     private MobileEntity _mobile;

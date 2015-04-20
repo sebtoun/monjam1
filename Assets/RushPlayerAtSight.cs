@@ -2,6 +2,7 @@
 using System.Collections;
 
 [RequireComponent(typeof(RushTarget))]
+[ExecutionOrder("Controller")]
 public class RushPlayerAtSight : MonoBehaviour
 {
     private RushTarget _rush;

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-[ExecutionOrder("Intent")]
+[ExecutionOrder("Controller")]
 [RequireComponent(typeof(MobileEntity))]
 public class PlayerControlled : MonoBehaviour
 {

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[ExecutionOrder( "Controller" )]
 public class PlayerTarget : MonoBehaviour
 {
     private Camera _cam;
@@ -15,7 +16,7 @@ public class PlayerTarget : MonoBehaviour
         Screen.showCursor = false;
     }
 
-    void LateUpdate()
+    void Update()
     {
         var mousePos = Input.mousePosition;
         
