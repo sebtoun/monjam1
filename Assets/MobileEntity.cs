@@ -7,7 +7,10 @@ public class MobileEntity : MonoBehaviour
     public float Speed = 10;
     public float Inertia = 0.1f;
     public float VelocityGain = 8;
-    
+
+    [Range(0, 1)]
+    public float ParametersRandomization = 0;
+
     private Vector2 _currentAcceleration;
     private Vector2 _currentVelocity;
 
@@ -21,9 +24,12 @@ public class MobileEntity : MonoBehaviour
     [HideInInspector]
     public float TargetAngle;
     
-    void Awake()
+    void Start()
     {
         _body = GetComponentInChildren<Rigidbody2D>();
+        Speed = Speed*(1 + Random.value*ParametersRandomization);
+        Inertia = Inertia*(1 + Random.value*ParametersRandomization);
+        VelocityGain = VelocityGain * (1 + Random.value * ParametersRandomization);
     }
 
     void Update()
