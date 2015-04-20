@@ -25,4 +25,17 @@ public class RushTarget : MonoBehaviour
             _mobile.TargetVelocity = Vector2.zero;
         }
     }
+
+    void SetTarget( Transform target )
+    {
+        Target = target;
+    }
+
+    void UnsetTarget( Transform target )
+    {
+        if (Target == target)
+        {
+            Target = null;
+        }
+    }
 }

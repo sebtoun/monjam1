@@ -5,23 +5,15 @@ using System.Collections;
 [ExecutionOrder("Controller")]
 public class RushPlayerAtSight : MonoBehaviour
 {
-    private RushTarget _rush;
-
-    void Awake()
-    {
-        _rush = GetComponent<RushTarget>();
-    }
-
     void OnTriggerEnter2D(Collider2D other)
     {
         // Debug.Log(other.gameObject + " entering zone " + this);
-        _rush.Target = other.transform;
+        BroadcastMessage("SetTarget", other.transform, SendMessageOptions.DontRequireReceiver);
     }
 
     void OnTriggerExit2D( Collider2D other )
     {
         // Debug.Log( other.gameObject + " exiting zone " + this );
-        if (other.transform == _rush.Target)
-            _rush.Target = null;
+        BroadcastMessage( "UnsetTarget", other.transform, SendMessageOptions.DontRequireReceiver );
     }
 }
