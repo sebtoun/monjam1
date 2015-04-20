@@ -1,0 +1,41 @@
+﻿using UnityEngine;
+using System.Collections;
+
+[ExecutionOrder("Movement")]
+public class MobileEntity : MonoBehaviour 
+{
+    public float Speed = 10;
+    public float Inertia = 0.1f;
+    public float VelocityGain = 8;
+    
+    private Vector2 _currentAcceleration;
+    private Vector2 _currentVelocity;
+
+    private float _angularVelocity;
+    private float _currentAngle;
+    
+    private Rigidbody2D _body;
+
+    [HideInInspector]
+    public Vector2 TargetVelocity;
+    [HideInInspector]
+    public float TargetAngle;
+    
+    void Awake()
+    {
+        _body = GetComponentInChildren<Rigidbody2D>();
+    }
+
+    void Update()
+    {
+        _currentVelocity = Vector2.SmoothDamp( _currentVelocity, TargetVelocity * Speed, ref _currentAcceleration, Inertia );
+        _currentAngle = Mathf.SmoothDampAngle( _currentAngle, TargetAngle, ref _angularVelocity, Inertia );
+    }
+
+    void FixedUpdate()
+    {
+        // _body.velocity = _currentVelocity;
+        _body.AddForce( (_currentVelocity - _body.velocity) * VelocityGain, ForceMode2D.Force );
+        _body.MoveRotation( _currentAngle );
+    }
+}

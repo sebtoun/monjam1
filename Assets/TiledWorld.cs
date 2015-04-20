@@ -48,7 +48,6 @@ public class TiledWorld : MonoBehaviour
             
             for (var c = -TileWidth/2; c < TileWidth/2; ++c)
             {
-                Debug.Log( _tileFromType[GetTileType( c, r )] );
                 var tile = Instantiate( _tileFromType[GetTileType( c, r )], new Vector3( x, y ), Quaternion.identity ) as GameObject;
                 tile.transform.parent = root;
                 DontSaveObject(tile);

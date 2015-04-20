@@ -24,7 +24,10 @@ public class ExecutionOrderGroups : ScriptableObject
                 Debug.LogError("Object not properly initialized.", this);
                 return null;
             }
-            return GroupsData.ToDictionary(g => g.Name, g => g.Order);
+            var groups = GroupsData.ToDictionary(g => g.Name, g => g.Order);
+            if (!groups.ContainsKey("Default"))
+                groups["Default"] = 0;
+            return groups;
         } 
     }
 }
