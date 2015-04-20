@@ -7,7 +7,7 @@ public class RushPlayerAtSight : MonoBehaviour
 {
     private RushTarget _rush;
 
-    void Start()
+    void Awake()
     {
         _rush = GetComponent<RushTarget>();
     }
