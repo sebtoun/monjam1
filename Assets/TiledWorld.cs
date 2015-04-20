@@ -17,7 +17,7 @@ public class TiledWorld : MonoBehaviour
     public GameObject VoidPrefab;
 
     public int RoomMinSize = 5;
-    public int RoomMaxSize = 10;
+    public int RoomMaxSize = 15;
 
     public Vector3 TileSize = Vector2.one;
 
@@ -38,8 +38,9 @@ public class TiledWorld : MonoBehaviour
             {TileType.Floor, FloorPrefab},
             {TileType.Wall, WallPrefab},
         };
+
         if (!_generated)
-            GenerateTiles();
+            GenerateFloorPlan();
     }
 
     private class Room
@@ -51,7 +52,7 @@ public class TiledWorld : MonoBehaviour
 
         public bool Collide(Room other)
         {
-            return x > other.x + other.w || x + w < other.x || y > other.y + other.h || y + h < other.y;
+            return !(x > other.x + other.w || x + w < other.x || y > other.y + other.h || y + h < other.y);
         }
 
         public float SquaredDistance(Room other)
@@ -81,14 +82,21 @@ public class TiledWorld : MonoBehaviour
             if (rooms.Any(r => r.Collide(room)))
                 continue;
 
-            room.w -= 1;
-            room.h -= 1;
+            room.w = Math.Min(room.x + room.w, TileWidth) - room.x - 1;
+            room.h = Math.Min(room.y + room.h, TileHeight) - room.y - 1;
             
             rooms.Insert(0, room);
         }
 
-        SquashRooms(rooms);
-        GenerateCorridors(tiles, rooms);
+        //SquashRooms(rooms);
+        //GenerateCorridors(tiles, rooms);
+
+        foreach (var room in rooms)
+            for (var x = room.x; x < room.x + room.w; ++x)
+                for (var y = room.y; y < room.y + room.h; ++y)
+                    tiles[x, y] = TileType.Floor;
+
+        GenerateTiles(tiles);
     }
 
     private static void SquashRooms(List<Room> rooms)
@@ -120,31 +128,54 @@ public class TiledWorld : MonoBehaviour
         {
             if (lastRoom != null)
             {
-                
+                var pointA = new Vector2
+                {
+                    x = Random.Range(room.x, room.x + room.w),
+                    y = Random.Range(room.y, room.y + room.h)
+                };
+                var pointB = new Vector2
+                {
+                    x = Random.Range(lastRoom.x, lastRoom.x + lastRoom.w),
+                    y = Random.Range(lastRoom.y, lastRoom.y + lastRoom.h)
+                };
+
+                while (pointB != pointA)
+                {
+                    if (pointB.x != pointA.x)
+                    {
+                        if (pointB.x > pointA.x) --pointB.x;
+                        else ++pointB.x;
+                    }
+                    else if (pointB.y != pointA.y)
+                    {
+                        if (pointB.y > pointA.y) --pointB.y;
+                        else ++pointB.y;
+                    }
+
+                    tiles[(int)pointB.x, (int)pointB.y] = TileType.Floor;
+                }
             }
 
             lastRoom = room;
         }   
     }
 
-    private void GenerateTiles()
+    private void GenerateTiles(TileType[,] tiles)
     {
-        for (var y = 0; y < TileHeight; ++y)
-        {
-            for (var x = 0; x < TileWidth; ++x)
-            {
-                Debug.Log( _tileFromType[GetTileType( x, y )] );
-                CreateTile(x, y);
-            }
-        }
+        for (var x = 0; x < TileHeight; ++x)
+            for (var y = 0; y < TileWidth; ++y)
+                CreateTile(x, y, tiles[x, y]);
 
         _generated = true;
     }
 
-    private void CreateTile(int x, int y)
+    private void CreateTile(int x, int y, TileType type)
     {
+        if (isBorder(x, y))
+            type = TileType.Wall;
+
         var position = new Vector3(TileSize.x * x, TileSize.y * y);
-        var tile = Instantiate(_tileFromType[GetTileType(x, y)], position, Quaternion.identity) as GameObject;
+        var tile = Instantiate(_tileFromType[type], position, Quaternion.identity) as GameObject;
 
         if (tile == null)
             return;
@@ -164,10 +195,8 @@ public class TiledWorld : MonoBehaviour
         }
     }
 
-    private TileType GetTileType(int x, int y)
+    private bool isBorder(int x, int y)
     {
-        if (x == 0 || x == TileWidth - 1 || y == 0 || y == TileHeight - 1)
-            return TileType.Wall;
-        return TileType.Floor;
+        return x == 0 || x == TileWidth - 1 || y == 0 || y == TileHeight - 1;
     }
 }
