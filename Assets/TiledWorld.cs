@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 [ExecuteInEditMode]
 public class TiledWorld : MonoBehaviour
 {
     public int TileWidth = 32;
     public int TileHeight = 32;
-    public int radius = 12;
 
     private bool _generated;
 
@@ -14,12 +16,15 @@ public class TiledWorld : MonoBehaviour
     public GameObject WallPrefab;
     public GameObject VoidPrefab;
 
+    public int RoomMinSize = 5;
+    public int RoomMaxSize = 10;
+
     public Vector3 TileSize = Vector2.one;
 
     public enum TileType
     {
+        Wall = 0,
         Floor,
-        Wall,
         Void
     }
 
@@ -34,33 +39,119 @@ public class TiledWorld : MonoBehaviour
             {TileType.Wall, WallPrefab},
         };
         if (!_generated)
-            this.GenerateTiles();
+            GenerateTiles();
     }
 
-    public void GenerateTiles()
+    private class Room
     {
-        var root = transform;
-        var y = (-TileHeight / 2 + 0.5f) * TileSize.y;
-        
-        for (var r = -TileHeight/2; r < TileHeight/2; ++r)
+        public int x;
+        public int y;
+        public int w;
+        public int h;
+
+        public bool Collide(Room other)
         {
-            var x = (-TileWidth / 2 + 0.5f) * TileSize.x;    
-            
-            for (var c = -TileWidth/2; c < TileWidth/2; ++c)
+            return x > other.x + other.w || x + w < other.x || y > other.y + other.h || y + h < other.y;
+        }
+
+        public float SquaredDistance(Room other)
+        {
+            return (float)(Math.Pow((x + w) / 2 - (other.x + other.w) / 2, 2) + Math.Pow((y + h) / 2 - (other.y + other.h) / 2, 2));
+        }
+    }
+
+    private void GenerateFloorPlan()
+    {
+        var tiles = new TileType[TileWidth,TileHeight];
+        tiles.Initialize();
+
+        var roomCount = Random.Range(10, 20);
+        var rooms = new List<Room>();
+
+        while (rooms.Count < roomCount)
+        {
+            var room = new Room
             {
-                Debug.Log( _tileFromType[GetTileType( c, r )] );
-                var tile = Instantiate( _tileFromType[GetTileType( c, r )], new Vector3( x, y ), Quaternion.identity ) as GameObject;
-                tile.transform.parent = root;
-                DontSaveObject(tile);
-                tile.name = string.Format( "tile_{0}x{1}", r, c );
+                x = Random.Range(1, TileWidth),
+                y = Random.Range(1, TileHeight),
+                w = Random.Range(RoomMinSize, RoomMaxSize),
+                h = Random.Range(RoomMinSize, RoomMaxSize)
+            };
+
+            if (rooms.Any(r => r.Collide(room)))
+                continue;
+
+            room.w -= 1;
+            room.h -= 1;
             
-                x += TileSize.x;
+            rooms.Insert(0, room);
+        }
+
+        SquashRooms(rooms);
+        GenerateCorridors(tiles, rooms);
+    }
+
+    private static void SquashRooms(List<Room> rooms)
+    {
+        rooms.Sort(delegate(Room l, Room r)
+        {
+            if (l.x > r.x)
+                return 1;
+            if (l.x == r.x && l.y > r.y)
+                return 1;
+            if (l.x == r.x && l.y == r.y)
+                return 0;
+            return -1;
+        });
+
+        var lastRoom = new Room {x = 1, y = 1, w = 0, h = 0};
+        foreach (var room in rooms)
+        {
+            room.x = Math.Min(Math.Min(room.x, 1), lastRoom.x + lastRoom.w + 1);
+            room.y = Math.Min(Math.Min(room.y, 1), lastRoom.y + lastRoom.w + 1);
+            lastRoom = room;
+        }
+    }
+
+    private void GenerateCorridors(TileType[,] tiles, List<Room> rooms)
+    {
+        Room lastRoom = null;
+        foreach (var room in rooms)
+        {
+            if (lastRoom != null)
+            {
+                
             }
-            
-            y += TileSize.y;
+
+            lastRoom = room;
+        }   
+    }
+
+    private void GenerateTiles()
+    {
+        for (var y = 0; y < TileHeight; ++y)
+        {
+            for (var x = 0; x < TileWidth; ++x)
+            {
+                Debug.Log( _tileFromType[GetTileType( x, y )] );
+                CreateTile(x, y);
+            }
         }
 
         _generated = true;
+    }
+
+    private void CreateTile(int x, int y)
+    {
+        var position = new Vector3(TileSize.x * x, TileSize.y * y);
+        var tile = Instantiate(_tileFromType[GetTileType(x, y)], position, Quaternion.identity) as GameObject;
+
+        if (tile == null)
+            return;
+
+        tile.transform.parent = transform;
+        DontSaveObject(tile);
+        tile.name = string.Format("tile_{0}x{1}", x, y);
     }
 
     private static void DontSaveObject(GameObject obj)
@@ -75,11 +166,8 @@ public class TiledWorld : MonoBehaviour
 
     private TileType GetTileType(int x, int y)
     {
-        if (x * x + y * y < radius * radius)
-            return TileType.Floor;
-        else if (x * x + y * y < (radius + 2) * (radius + 2))
+        if (x == 0 || x == TileWidth - 1 || y == 0 || y == TileHeight - 1)
             return TileType.Wall;
-        else 
-            return TileType.Void;
+        return TileType.Floor;
     }
 }
