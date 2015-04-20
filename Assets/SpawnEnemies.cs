@@ -24,7 +24,7 @@ public class SpawnEnemies : MonoBehaviour
             int iterations = 5;
             do
             {
-                position = Random.insideUnitCircle*world.radius;
+                position = Random.insideUnitCircle*world.radius*world.TileSize.magnitude;
                 iterations--;
             } while (iterations > 0 && Physics2D.OverlapArea(position + box.center - box.size/2, position + box.center + box.size/2, mask) != null );
 
