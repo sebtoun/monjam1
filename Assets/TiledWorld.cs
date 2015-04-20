@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class TiledWorld : MonoBehaviour
 {
     public int TileWidth = 32;
@@ -50,6 +51,7 @@ public class TiledWorld : MonoBehaviour
                 Debug.Log( _tileFromType[GetTileType( c, r )] );
                 var tile = Instantiate( _tileFromType[GetTileType( c, r )], new Vector3( x, y ), Quaternion.identity ) as GameObject;
                 tile.transform.parent = root;
+                DontSaveObject(tile);
                 tile.name = string.Format( "tile_{0}x{1}", r, c );
             
                 x += TileSize.x;
@@ -59,6 +61,16 @@ public class TiledWorld : MonoBehaviour
         }
 
         _generated = true;
+    }
+
+    private static void DontSaveObject(GameObject obj)
+    {
+        obj.hideFlags = HideFlags.DontSave;
+        foreach (Transform child in obj.transform)
+        {
+            child.gameObject.hideFlags = HideFlags.DontSave;
+            DontSaveObject(child.gameObject);
+        }
     }
 
     private TileType GetTileType(int x, int y)
