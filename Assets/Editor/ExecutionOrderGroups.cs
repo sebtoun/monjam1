@@ -15,7 +15,7 @@ public class ExecutionOrderGroups : ScriptableObject
 
     public Group[] GroupsData;
 
-    public Dictionary<string, int> GroupsExecutionOrder
+    public Dictionary<string, int> Groups
     {
         get
         {

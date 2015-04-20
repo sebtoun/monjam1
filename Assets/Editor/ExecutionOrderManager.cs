@@ -1,20 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-[InitializeOnLoad]
+//[InitializeOnLoad]
 public class ExecutionOrderManager : Editor
 {
-    static ExecutionOrderManager()
+    [MenuItem("Tools/Set Execution Order")]
+    public static void SetExecutionOrder()
     {
-        ExecutionOrderGroups groups = null;
+        Dictionary<string, int> groups;
         try
         {
-            groups =
-                AssetDatabase.LoadAssetAtPath(
-                    AssetDatabase.GUIDToAssetPath(AssetDatabase.FindAssets("ExecutionOrderGroups").First()),
-                    typeof (ExecutionOrderGroups)) as ExecutionOrderGroups; 
+            var groupsPath =
+                AssetDatabase.FindAssets("ExecutionOrderGroups")
+                    .Select<string, string>(AssetDatabase.GUIDToAssetPath)
+                    .First(path => path.EndsWith(".asset"));
+            groups = (AssetDatabase.LoadAssetAtPath(groupsPath, typeof (ExecutionOrderGroups)) as ExecutionOrderGroups).Groups;
         }
         catch (Exception)
         {
@@ -28,24 +31,25 @@ public class ExecutionOrderManager : Editor
             return;
         }
         
-        Debug.Log( "Found ExecutionOrderGroups instance: " + groups.GroupsExecutionOrder.ToString() );
-
-        // Get the name of the script we want to change it's execution order
-        string scriptName = "";//typeof( MyMonoBehaviourClass ).Name;
-
-        // Iterate through all scripts (Might be a better way to do this?)
-        foreach (MonoScript monoScript in MonoImporter.GetAllRuntimeMonoScripts())
+        foreach (
+            MonoScript monoScript in
+                MonoImporter.GetAllRuntimeMonoScripts()
+                    .Where( script => script.GetClass() != null && Attribute.GetCustomAttribute(script.GetClass(), typeof (ExecutionOrderAttribute)) != null) )
         {
-            // If found our script
-            if (monoScript.name == scriptName)
+            var executionOrderGroup = (Attribute.GetCustomAttribute(monoScript.GetClass(), typeof (ExecutionOrderAttribute)) as ExecutionOrderAttribute).Group;
+
+            if (!groups.ContainsKey(executionOrderGroup))
             {
-                // And it's not at the execution time we want already
-                // (Without this we will get stuck in an infinite loop)
-                if (MonoImporter.GetExecutionOrder( monoScript ) != -100)
+                Debug.LogWarning("Unknown execution order group: " + executionOrderGroup);
+            }
+            else
+            {
+                var executionOrder = groups[executionOrderGroup];
+                if (MonoImporter.GetExecutionOrder( monoScript ) != executionOrder)
                 {
-                    MonoImporter.SetExecutionOrder( monoScript, -100 );
+                    Debug.Log(string.Format("Setting execution order of {0} to {1}", monoScript.name, executionOrder));
+                    MonoImporter.SetExecutionOrder( monoScript, executionOrder);
                 }
-                break;
             }
         }
     }

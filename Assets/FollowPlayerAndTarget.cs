@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[ExecutionOrder(Group = "Camera")]
 public class FollowPlayerAndTarget : MonoBehaviour
 {
     private Transform _player;
