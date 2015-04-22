@@ -32,7 +32,7 @@ public class PlayerControlled : MonoBehaviour
         if (_targetVelocity.sqrMagnitude > 1)
             _targetVelocity.Normalize();
         
-        // _currentVelocity = Vector2.SmoothDamp( _currentVelocity, _targetVelocity * Speed, ref _currentAcceleration, Inertia );
+        _currentVelocity = Vector2.SmoothDamp( _currentVelocity, _targetVelocity * Speed, ref _currentAcceleration, Inertia );
     }
 
     public float PositionalGain = 2;

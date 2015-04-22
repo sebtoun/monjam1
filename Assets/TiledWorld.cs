@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -16,8 +17,10 @@ public class TiledWorld : MonoBehaviour
     public GameObject WallPrefab;
     public GameObject VoidPrefab;
 
+    public int Tries = 1000;
     public int RoomMinSize = 5;
     public int RoomMaxSize = 15;
+    public bool SquashTheRooms = true;
 
     public Vector3 TileSize = Vector2.one;
 
@@ -30,6 +33,7 @@ public class TiledWorld : MonoBehaviour
 
     private Dictionary<TileType, GameObject> _tileFromType;
 
+    // ReSharper disable once UnusedMember.Local
     void Awake()
     {
         _tileFromType = new Dictionary<TileType, GameObject>()
@@ -54,11 +58,12 @@ public class TiledWorld : MonoBehaviour
         {
             return !(x > other.x + other.w || x + w < other.x || y > other.y + other.h || y + h < other.y);
         }
+    }
 
-        public float SquaredDistance(Room other)
-        {
-            return (float)(Math.Pow((x + w) / 2 - (other.x + other.w) / 2, 2) + Math.Pow((y + h) / 2 - (other.y + other.h) / 2, 2));
-        }
+    private class Point
+    {
+        public int x;
+        public int y;
     }
 
     private void GenerateFloorPlan()
@@ -66,10 +71,9 @@ public class TiledWorld : MonoBehaviour
         var tiles = new TileType[TileWidth,TileHeight];
         tiles.Initialize();
 
-        var roomCount = Random.Range(10, 20);
         var rooms = new List<Room>();
 
-        while (rooms.Count < roomCount)
+        for (var i = Tries; i > 0; --i)
         {
             var room = new Room
             {
@@ -88,8 +92,10 @@ public class TiledWorld : MonoBehaviour
             rooms.Insert(0, room);
         }
 
-        //SquashRooms(rooms);
-        //GenerateCorridors(tiles, rooms);
+        if (SquashTheRooms)
+            SquashRooms(rooms);
+
+        GenerateCorridors(tiles, rooms);
 
         foreach (var room in rooms)
             for (var x = room.x; x < room.x + room.w; ++x)
@@ -128,18 +134,18 @@ public class TiledWorld : MonoBehaviour
         {
             if (lastRoom != null)
             {
-                var pointA = new Vector2
+                var pointA = new Point
                 {
                     x = Random.Range(room.x, room.x + room.w),
                     y = Random.Range(room.y, room.y + room.h)
                 };
-                var pointB = new Vector2
+                var pointB = new Point
                 {
                     x = Random.Range(lastRoom.x, lastRoom.x + lastRoom.w),
                     y = Random.Range(lastRoom.y, lastRoom.y + lastRoom.h)
                 };
 
-                while (pointB != pointA)
+                while (pointB.x != pointA.x && pointB.y != pointA.y)
                 {
                     if (pointB.x != pointA.x)
                     {
@@ -152,7 +158,7 @@ public class TiledWorld : MonoBehaviour
                         else ++pointB.y;
                     }
 
-                    tiles[(int)pointB.x, (int)pointB.y] = TileType.Floor;
+                    tiles[pointB.x, pointB.y] = TileType.Floor;
                 }
             }
 
@@ -198,5 +204,14 @@ public class TiledWorld : MonoBehaviour
     private bool isBorder(int x, int y)
     {
         return x == 0 || x == TileWidth - 1 || y == 0 || y == TileHeight - 1;
+    }
+
+    public void Reset()
+    {
+        var children = (from Transform child
+                        in transform
+                        select child.gameObject).ToList();
+        children.ForEach(DestroyImmediate);
+        GenerateFloorPlan();
     }
 }
