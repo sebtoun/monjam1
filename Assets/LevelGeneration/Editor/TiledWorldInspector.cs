@@ -13,5 +13,8 @@ public class TiledWorldInspector : Editor
 
         if (GUILayout.Button("Regenerate Level"))
             map.Reset();
+        if (GUILayout.Button( "Clear Level" ))
+            map.Clear();
+
     }
 }
