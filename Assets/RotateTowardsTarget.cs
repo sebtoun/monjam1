@@ -16,7 +16,6 @@ public class RotateTowardsTarget : MonoBehaviour
 
     void Update()
     {
-
         var targetOrientation = Target.position - transform.position;
         _mobile.TargetAngle = Mathf.Atan2(targetOrientation.y, targetOrientation.x) * Mathf.Rad2Deg - 90;
     }

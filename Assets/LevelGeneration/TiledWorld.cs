@@ -20,6 +20,8 @@ public class TiledWorld : MonoBehaviour
 
     public LevelGenerator Generator;
 
+    private TileType[,] _tiles;
+
     public enum TileType
     {
         Wall = 0,
@@ -55,6 +57,7 @@ public class TiledWorld : MonoBehaviour
 
         if (GenerateOnAwake)
         {
+            _tiles = new TileType[TileWidth, TileHeight];
             GenerateLevel();
         }
         
@@ -62,11 +65,14 @@ public class TiledWorld : MonoBehaviour
         SendMessage( "GenerateEnemies" );
     }
 
-    private void GenerateLevel()
+    public void GenerateLevel()
     {
-        var tiles = new TileType[TileWidth, TileHeight];
-        Generator.GenerateLevel(tiles);
-        GenerateTiles(tiles);
+        if (_tiles == null || _tiles.GetLength(0) != TileWidth || _tiles.GetLength(1) != TileHeight)
+            _tiles = new TileType[TileWidth, TileHeight];
+        _tiles.Initialize();
+
+        Generator.GenerateLevel(_tiles);
+        GenerateTiles(_tiles);
     }
     
     private void GenerateTiles(TileType[,] tiles)
@@ -112,8 +118,21 @@ public class TiledWorld : MonoBehaviour
         GenerateLevel();
     }
 
-    public Vector2 SamplePosition()
+    public Vector2 RandomPosition()
     {
         return new Vector2(Random.value * TileWidth * TileSize.x, Random.value * TileHeight * TileSize.y);
+    }
+
+    public bool SampleEmptyPosition(Vector2 AABB, out Vector2 position, int iterations = 5)
+    {
+        var mask = (1 << LayerMask.NameToLayer( "Tiles" )) | (1 << LayerMask.NameToLayer( "Default" ));
+        do
+        {
+            position = RandomPosition();
+            iterations--;
+        } while (iterations > 0 &&
+                 Physics2D.OverlapArea(position - AABB/2,
+                     position + AABB/2, mask) != null);
+        return iterations > 0;
     }
 }

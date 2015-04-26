@@ -32,7 +32,6 @@ public class DefaultGenerator : LevelGenerator
 
     public override void GenerateLevel(TiledWorld.TileType[,] tiles)
     {
-        tiles.Initialize();
         var width = tiles.GetLength(0);
         var height = tiles.GetLength(1);
 

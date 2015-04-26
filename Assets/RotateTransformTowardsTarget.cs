@@ -11,17 +11,18 @@ public class RotateTransformTowardsTarget : MonoBehaviour
 
     void Start()
     {
-        Target = GameObject.FindGameObjectWithTag( "Target" ).transform;
         _tr = transform;
     }
 
     void LateUpdate()
     {
-
-        var targetOrientation = Target.position - transform.position;
-        var targetAngle = Mathf.Atan2( targetOrientation.y, targetOrientation.x ) * Mathf.Rad2Deg - 90;
-        _currentOrientation = Mathf.SmoothDampAngle( _currentOrientation, targetAngle, ref _angularVelocity, Inertia );
-        _tr.rotation = Quaternion.AngleAxis(_currentOrientation, Vector3.forward);
+        if (Target != null)
+        {
+            var targetOrientation = Target.position - transform.position;
+            var targetAngle = Mathf.Atan2(targetOrientation.y, targetOrientation.x)*Mathf.Rad2Deg - 90;
+            _currentOrientation = Mathf.SmoothDampAngle(_currentOrientation, targetAngle, ref _angularVelocity, Inertia);
+            _tr.rotation = Quaternion.AngleAxis(_currentOrientation, Vector3.forward);
+        }
     }
 
     void SetTarget( Transform target )
