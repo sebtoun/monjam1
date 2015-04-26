@@ -1,31 +1,36 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[ExecutionOrder("Intent")]
 public class RotateTowardsTarget : MonoBehaviour
 {
-    private Transform _target;
-    private float _angularVelocity;
-    private float _currentOrientation;
-    public float Inertia = 0.2f;
+    public Transform Target;
+    private MobileEntity _mobile;
 
-    private Rigidbody2D _body;
-
-    void Awake()
+    void Start()
     {
-        _target = GameObject.FindGameObjectWithTag("Target").transform;
-        _body = rigidbody2D;
+        if (Target == null)
+            Target = GameObject.FindGameObjectWithTag( "Target" ).transform;
+        _mobile = GetComponent<MobileEntity>();
     }
 
     void Update()
     {
 
-        var targetOrientation = _target.position - transform.position;
-        var targetAngle = Mathf.Atan2(targetOrientation.y, targetOrientation.x) * Mathf.Rad2Deg - 90;
-        _currentOrientation = Mathf.SmoothDampAngle(_currentOrientation, targetAngle, ref _angularVelocity, Inertia);
+        var targetOrientation = Target.position - transform.position;
+        _mobile.TargetAngle = Mathf.Atan2(targetOrientation.y, targetOrientation.x) * Mathf.Rad2Deg - 90;
     }
 
-    void FixedUpdate()
+    void SetTarget(Transform target)
     {
-        _body.MoveRotation(_currentOrientation);
+        Target = target;
+    }
+
+    void UnsetTarget(Transform target)
+    {
+        if (Target == target)
+        {
+            Target = null;
+        }
     }
 }

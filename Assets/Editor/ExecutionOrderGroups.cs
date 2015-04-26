@@ -15,7 +15,7 @@ public class ExecutionOrderGroups : ScriptableObject
 
     public Group[] GroupsData;
 
-    public Dictionary<string, int> GroupsExecutionOrder
+    public Dictionary<string, int> Groups
     {
         get
         {
@@ -24,7 +24,10 @@ public class ExecutionOrderGroups : ScriptableObject
                 Debug.LogError("Object not properly initialized.", this);
                 return null;
             }
-            return GroupsData.ToDictionary(g => g.Name, g => g.Order);
+            var groups = GroupsData.ToDictionary(g => g.Name, g => g.Order);
+            if (!groups.ContainsKey("Default"))
+                groups["Default"] = 0;
+            return groups;
         } 
     }
 }

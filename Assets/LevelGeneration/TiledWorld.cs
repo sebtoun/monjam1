@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class TiledWorld : MonoBehaviour
 {
@@ -52,7 +54,12 @@ public class TiledWorld : MonoBehaviour
         }
 
         if (GenerateOnAwake)
+        {
             GenerateLevel();
+        }
+        
+        SendMessage( "GeneratePlayer" );
+        SendMessage( "GenerateEnemies" );
     }
 
     private void GenerateLevel()
@@ -103,5 +110,10 @@ public class TiledWorld : MonoBehaviour
     {
         Clear();
         GenerateLevel();
+    }
+
+    public Vector2 SamplePosition()
+    {
+        return new Vector2(Random.value * TileWidth * TileSize.x, Random.value * TileHeight * TileSize.y);
     }
 }
