@@ -8,10 +8,10 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 426342}
-  - 114: {fileID: 11426342}
-  - 114: {fileID: 11463690}
   - 114: {fileID: 11484612}
   - 114: {fileID: 11484610}
+  - 114: {fileID: 11426342}
+  - 114: {fileID: 11463690}
   m_Layer: 0
   m_Name: World
   m_TagString: Untagged
