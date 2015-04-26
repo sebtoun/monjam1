@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Random = UnityEngine.Random;
@@ -30,10 +31,14 @@ public class DefaultGenerator : LevelGenerator
         public int y;
     }
 
-    public override void GenerateLevel(TiledWorld.TileType[,] tiles)
+    public override IEnumerator GenerateLevelStepByStep(TiledWorld.TileType[,] tiles)
     {
         var width = tiles.GetLength(0);
         var height = tiles.GetLength(1);
+
+        FillWithType(tiles);
+
+        yield return null;
 
         var rooms = new List<Room>();
 
@@ -41,8 +46,8 @@ public class DefaultGenerator : LevelGenerator
         {
             var room = new Room
             {
-                x = Random.Range(1, width),
-                y = Random.Range(1, height),
+                x = Random.Range( 1, width - RoomMinSize ),
+                y = Random.Range( 1, height - RoomMinSize ),
                 w = Random.Range(RoomMinSize, RoomMaxSize),
                 h = Random.Range(RoomMinSize, RoomMaxSize)
             };
@@ -59,33 +64,23 @@ public class DefaultGenerator : LevelGenerator
         if (SquashTheRooms)
             SquashRooms(rooms);
 
-        GenerateCorridors(tiles, rooms);
-
         foreach (var room in rooms)
+        {
             for (var x = room.x; x < room.x + room.w; ++x)
                 for (var y = room.y; y < room.y + room.h; ++y)
                     tiles[x, y] = TiledWorld.TileType.Floor;
 
+            yield return null;
+        }
+
+        GenerateCorridors( tiles, rooms );
+
+        yield return null;
+
         CloseBorders(tiles);
     }
 
-    private void CloseBorders(TiledWorld.TileType[,] tiles)
-    {
-        var width = tiles.GetLength( 0 );
-        var height = tiles.GetLength( 1 );
-        
-        for (int i = 0; i < width; ++i)
-            tiles[i, 0] = TiledWorld.TileType.Wall;
-        for (int i = 0; i < width; ++i)
-            tiles[i, height - 1] = TiledWorld.TileType.Wall;
-        
-        for (int i = 0; i < height; ++i)
-            tiles[0, i] = TiledWorld.TileType.Wall;
-        for (int i = 0; i < height; ++i)
-            tiles[width - 1, i] = TiledWorld.TileType.Wall;
-    }
-
-    private static void SquashRooms( List<Room> rooms )
+    private void SquashRooms( List<Room> rooms )
     {
         rooms.Sort( delegate( Room l, Room r )
         {

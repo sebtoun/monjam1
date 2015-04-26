@@ -27,4 +27,29 @@ public abstract class LevelGenerator : MonoBehaviour
         GenerateLevel(tiles);
         yield break;
     }
+
+    protected void FillWithType( TiledWorld.TileType[,] tiles, TiledWorld.TileType type = TiledWorld.TileType.Wall )
+    {
+        var width = tiles.GetLength( 0 );
+        var height = tiles.GetLength( 1 );
+        for (int i = 0; i < width; i++)
+            for (int j = 0; j < height; j++)
+                tiles.SetValue(type, i, j);
+    }
+
+    protected void CloseBorders(TiledWorld.TileType[,] tiles, TiledWorld.TileType type = TiledWorld.TileType.Wall)
+    {
+        var width = tiles.GetLength(0);
+        var height = tiles.GetLength(1);
+
+        for (int i = 0; i < width; ++i)
+            tiles[i, 0] = type;
+        for (int i = 0; i < width; ++i)
+            tiles[i, height - 1] = type;
+
+        for (int i = 0; i < height; ++i)
+            tiles[0, i] = type;
+        for (int i = 0; i < height; ++i)
+            tiles[width - 1, i] = type;
+    }
 }

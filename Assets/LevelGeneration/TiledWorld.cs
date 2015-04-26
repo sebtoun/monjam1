@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
@@ -21,7 +22,7 @@ public class TiledWorld : MonoBehaviour
     public LevelGenerator Generator;
 
     private TileType[,] _tiles;
-
+    
     public enum TileType
     {
         Wall = 0,
@@ -69,10 +70,26 @@ public class TiledWorld : MonoBehaviour
     {
         if (_tiles == null || _tiles.GetLength(0) != TileWidth || _tiles.GetLength(1) != TileHeight)
             _tiles = new TileType[TileWidth, TileHeight];
-        _tiles.Initialize();
-
+            
         Generator.GenerateLevel(_tiles);
         GenerateTiles(_tiles);
+    }
+
+    public IEnumerator GenerateLevelStepByStep()
+    {
+        if (_tiles == null || _tiles.GetLength( 0 ) != TileWidth || _tiles.GetLength( 1 ) != TileHeight)
+            _tiles = new TileType[TileWidth, TileHeight];
+        
+        var levelGen = Generator.GenerateLevelStepByStep(_tiles);
+
+        while (levelGen.MoveNext())
+        {
+            Clear();
+            GenerateTiles( _tiles );
+            yield return null;
+        }
+        Clear();
+        GenerateTiles( _tiles );
     }
     
     private void GenerateTiles(TileType[,] tiles)
