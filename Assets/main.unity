@@ -189,6 +189,7 @@ GameObject:
   - 114: {fileID: 754954934}
   - 114: {fileID: 754954930}
   - 114: {fileID: 754954932}
+  - 114: {fileID: 754954935}
   m_Layer: 0
   m_Name: World
   m_TagString: Untagged
@@ -213,7 +214,7 @@ MonoBehaviour:
   WallPrefab: {fileID: 146844, guid: 6ca3d8b6fcbe61f46b145b1808eb030a, type: 2}
   VoidPrefab: {fileID: 190396, guid: 2b975d6b70ecbac43ad23e8ce1c688b5, type: 2}
   TileSize: {x: 2, y: 2, z: 0}
-  Generator: {fileID: 754954932}
+  Generator: {fileID: 754954935}
 --- !u!4 &754954931
 Transform:
   m_ObjectHideFlags: 0
@@ -271,6 +272,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 160488, guid: 354949caba57110489f2244688bc3256, type: 2}
+--- !u!114 &754954935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 754954929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6fba644c6679a54d9cc7cbca6348aa7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LevelImage: {fileID: 2800000, guid: c426cbed23a779f42baaef16e0864545, type: 3}
 --- !u!1 &1071067924
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,6 +350,14 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 11426342, guid: 2eadd78e0faf5894399de00c75521d73, type: 2}
+      propertyPath: GenerateOnAwake
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11426342, guid: 2eadd78e0faf5894399de00c75521d73, type: 2}
+      propertyPath: Generator
+      value: 
+      objectReference: {fileID: 754954935}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2eadd78e0faf5894399de00c75521d73, type: 2}
   m_RootGameObject: {fileID: 754954929}
