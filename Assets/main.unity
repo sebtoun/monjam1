@@ -208,8 +208,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6235fe6867a194e4c8911d47bfab4581, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TileWidth: 32
-  TileHeight: 32
   GenerateOnAwake: 1
   FloorPrefab: {fileID: 190396, guid: 2b975d6b70ecbac43ad23e8ce1c688b5, type: 2}
   WallPrefab: {fileID: 146844, guid: 6ca3d8b6fcbe61f46b145b1808eb030a, type: 2}
@@ -244,6 +242,8 @@ MonoBehaviour:
   RoomMinSize: 5
   RoomMaxSize: 15
   SquashTheRooms: 0
+  TileWidth: 32
+  TileHeight: 32
 --- !u!114 &754954933
 MonoBehaviour:
   m_ObjectHideFlags: 0

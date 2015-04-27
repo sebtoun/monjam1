@@ -11,6 +11,8 @@ public class DefaultGenerator : LevelGenerator
     public int RoomMaxSize = 15;
     public bool SquashTheRooms = true;
 
+    public int TileWidth = 32;
+    public int TileHeight = 32;
 
     private class Room
     {
@@ -31,14 +33,15 @@ public class DefaultGenerator : LevelGenerator
         public int y;
     }
 
-    public override IEnumerator GenerateLevelStepByStep(TiledWorld.TileType[,] tiles)
+    public override IEnumerator GenerateLevelStepByStep()
     {
-        var width = tiles.GetLength(0);
-        var height = tiles.GetLength(1);
+        var width = TileWidth;
+        var height = TileHeight;
 
-        FillWithType(tiles);
+        var tiles = new TiledWorld.TileType[width, height];
+        InitializeWithType(tiles);
 
-        yield return null;
+        yield return tiles;
 
         var rooms = new List<Room>();
 
@@ -66,18 +69,17 @@ public class DefaultGenerator : LevelGenerator
 
         foreach (var room in rooms)
         {
-            for (var x = room.x; x < room.x + room.w; ++x)
-                for (var y = room.y; y < room.y + room.h; ++y)
-                    tiles[x, y] = TiledWorld.TileType.Floor;
-
-            yield return null;
+            FillAreaWithType(tiles, room.x, room.y, room.w, room.h, TiledWorld.TileType.Floor);
         }
+        yield return tiles;
 
         GenerateCorridors( tiles, rooms );
 
-        yield return null;
+        yield return tiles;
 
         CloseBorders(tiles);
+        
+        yield return tiles;
     }
 
     private void SquashRooms( List<Room> rooms )

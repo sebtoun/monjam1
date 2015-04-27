@@ -8,9 +8,6 @@ using Random = UnityEngine.Random;
 
 public class TiledWorld : MonoBehaviour
 {
-    public int TileWidth = 32;
-    public int TileHeight = 32;
-
     public bool GenerateOnAwake = true;
     
     public GameObject FloorPrefab;
@@ -22,6 +19,15 @@ public class TiledWorld : MonoBehaviour
     public LevelGenerator Generator;
 
     private TileType[,] _tiles;
+
+    public int TileWidth
+    {
+        get { return _tiles.GetLength(0); }
+    }
+    public int TileHeight
+    {
+        get { return _tiles.GetLength(1); }
+    }
     
     public enum TileType
     {
@@ -58,7 +64,6 @@ public class TiledWorld : MonoBehaviour
 
         if (GenerateOnAwake)
         {
-            _tiles = new TileType[TileWidth, TileHeight];
             GenerateLevel();
         }
         
@@ -68,22 +73,17 @@ public class TiledWorld : MonoBehaviour
 
     public void GenerateLevel()
     {
-        if (_tiles == null || _tiles.GetLength(0) != TileWidth || _tiles.GetLength(1) != TileHeight)
-            _tiles = new TileType[TileWidth, TileHeight];
-            
-        Generator.GenerateLevel(_tiles);
+        _tiles = Generator.GenerateLevel();
         GenerateTiles(_tiles);
     }
 
     public IEnumerator GenerateLevelStepByStep()
     {
-        if (_tiles == null || _tiles.GetLength( 0 ) != TileWidth || _tiles.GetLength( 1 ) != TileHeight)
-            _tiles = new TileType[TileWidth, TileHeight];
-        
-        var levelGen = Generator.GenerateLevelStepByStep(_tiles);
+        var levelGen = Generator.GenerateLevelStepByStep();
 
         while (levelGen.MoveNext())
         {
+            _tiles = levelGen.Current as TileType[,];
             Clear();
             GenerateTiles( _tiles );
             yield return null;
