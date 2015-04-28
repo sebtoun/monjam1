@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class DefaultGenerator : LevelGenerator 
@@ -14,6 +15,12 @@ public class DefaultGenerator : LevelGenerator
     public int TileWidth = 32;
     public int TileHeight = 32;
 
+    private class Point
+    {
+        public int x;
+        public int y;
+    }
+
     private class Room
     {
         public int x;
@@ -25,12 +32,34 @@ public class DefaultGenerator : LevelGenerator
         {
             return !(x > other.x + other.w || x + w < other.x || y > other.y + other.h || y + h < other.y);
         }
-    }
 
-    private class Point
-    {
-        public int x;
-        public int y;
+        public override bool Equals(object obj)
+        {
+            var other = obj as Room;
+            return other != null && x == other.x && y == other.y && w == other.w && h == other.h;
+        }
+
+        public float SquaredDistance(Room other)
+        {
+            var thisCenter = new Vector2(x + w / 2, y + h / 2);
+            var otherCenter = new Vector2(other.x + other.w / 2, other.y + other.h / 2);
+            return (otherCenter - thisCenter).sqrMagnitude;
+        }
+
+        public Room FindClosestRoom(Room[] rooms, int i)
+        {
+            Room closest = null;
+            var distance = float.MaxValue;
+            for (; i < rooms.Length; ++i)
+            {
+                var room = rooms[i];
+                var dist = SquaredDistance(room);
+                if (Equals(room, this) || !(dist < distance)) continue;
+                closest = room;
+                distance = dist;
+            }
+            return closest;
+        }
     }
 
     public override IEnumerator GenerateLevelStepByStep()
@@ -64,9 +93,6 @@ public class DefaultGenerator : LevelGenerator
             rooms.Insert(0, room);
         }
 
-        if (SquashTheRooms)
-            SquashRooms(rooms);
-
         foreach (var room in rooms)
         {
             FillAreaWithType(tiles, room.x, room.y, room.w, room.h, TiledWorld.TileType.Floor);
@@ -82,64 +108,42 @@ public class DefaultGenerator : LevelGenerator
         yield return tiles;
     }
 
-    private void SquashRooms( List<Room> rooms )
+    private void GenerateCorridors( TiledWorld.TileType[,] tiles, IEnumerable<Room> rooms )
     {
-        rooms.Sort( delegate( Room l, Room r )
+        var arooms = rooms.ToArray();
+        for (var i = 0; i < arooms.Length; ++i)
         {
-            if (l.x > r.x)
-                return 1;
-            if (l.x == r.x && l.y > r.y)
-                return 1;
-            if (l.x == r.x && l.y == r.y)
-                return 0;
-            return -1;
-        } );
+            var roomA = arooms[i];
+            var roomB = roomA.FindClosestRoom(arooms, i + 1);
+            if (roomB == null)
+                continue;
 
-        var lastRoom = new Room { x = 1, y = 1, w = 0, h = 0 };
-        foreach (var room in rooms)
-        {
-            room.x = Math.Min( Math.Min( room.x, 1 ), lastRoom.x + lastRoom.w + 1 );
-            room.y = Math.Min( Math.Min( room.y, 1 ), lastRoom.y + lastRoom.w + 1 );
-            lastRoom = room;
-        }
-    }
-
-    private void GenerateCorridors( TiledWorld.TileType[,] tiles, List<Room> rooms )
-    {
-        Room lastRoom = null;
-        foreach (var room in rooms)
-        {
-            if (lastRoom != null)
+            var pointA = new Point
             {
-                var pointA = new Point
-                {
-                    x = Random.Range( room.x, room.x + room.w ),
-                    y = Random.Range( room.y, room.y + room.h )
-                };
-                var pointB = new Point
-                {
-                    x = Random.Range( lastRoom.x, lastRoom.x + lastRoom.w ),
-                    y = Random.Range( lastRoom.y, lastRoom.y + lastRoom.h )
-                };
+                x = Random.Range( roomA.x, roomA.x + roomA.w ),
+                y = Random.Range( roomA.y, roomA.y + roomA.h )
+            };
+            var pointB = new Point
+            {
+                x = Random.Range( roomB.x, roomB.x + roomB.w ),
+                y = Random.Range( roomB.y, roomB.y + roomB.h )
+            };
 
-                while (pointB.x != pointA.x && pointB.y != pointA.y)
+            while (!(pointB.x == pointA.x && pointB.y == pointA.y))
+            {
+                if (pointB.x != pointA.x)
                 {
-                    if (pointB.x != pointA.x)
-                    {
-                        if (pointB.x > pointA.x) --pointB.x;
-                        else ++pointB.x;
-                    }
-                    else if (pointB.y != pointA.y)
-                    {
-                        if (pointB.y > pointA.y) --pointB.y;
-                        else ++pointB.y;
-                    }
-
-                    tiles[pointB.x, pointB.y] = TiledWorld.TileType.Floor;
+                    if (pointB.x > pointA.x) --pointB.x;
+                    else ++pointB.x;
                 }
-            }
+                else if (pointB.y != pointA.y)
+                {
+                    if (pointB.y > pointA.y) --pointB.y;
+                    else ++pointB.y;
+                }
 
-            lastRoom = room;
+                tiles[pointB.x, pointB.y] = TiledWorld.TileType.Floor;
+            }
         }
     }
 
