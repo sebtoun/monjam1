@@ -4,6 +4,8 @@ using System.Collections;
 [ExecutionOrder( "Controller" )]
 public class PlayerTarget : MonoBehaviour
 {
+    public float Height = -1;
+
     private Transform _player;
     private Vector2 _localPos;
 
@@ -18,7 +20,7 @@ public class PlayerTarget : MonoBehaviour
     {
         _localPos += Input.GetAxis( "Mouse X" ) * Vector2.right + Input.GetAxis( "Mouse Y" ) * Vector2.up;
 
-        transform.position = _player.position + (Vector3)_localPos;
+        transform.position = _player.position + (Vector3)_localPos + Height * Vector3.forward;
     }
 
 }
