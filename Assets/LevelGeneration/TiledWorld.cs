@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
+using System.Xml.Serialization;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -96,20 +96,71 @@ public class TiledWorld : MonoBehaviour
     {
         for (var x = 0; x < TileHeight; ++x)
             for (var y = 0; y < TileWidth; ++y)
-                CreateTile(x, y, tiles[x, y]);
-   }
+                CreateTile(x, y, tiles);
+    }
 
-    private void CreateTile(int x, int y, TileType type)
+    private void SetWallTile(int x, int y, TileType[,] tiles, GameObject tile)
+    {
+        var offset = 0;
+        var neighbours = 0;
+        if (y < TileHeight - 1 && tiles[x, y + 1] == TileType.Floor) neighbours |= 1;
+        if (x < TileWidth - 1 && tiles[x + 1, y] == TileType.Floor) neighbours |= 2;
+        if (y > 0 && tiles[x, y - 1] == TileType.Floor) neighbours |= 4;
+        if (x > 0 && tiles[x - 1, y] == TileType.Floor) neighbours |= 8;
+
+        var isWalled = new Func<int, bool>(w => (neighbours & w) == w);
+        if (neighbours == 0x0F) // 4 walls
+            offset = 64 * 5;
+        else if (isWalled(1) && isWalled(4)) // 2 walls
+            offset = 64 * 2;
+        else if (isWalled(2) && isWalled(8))
+        {
+            offset = 64 * 2;
+            tile.transform.Rotate(Vector3.forward, 90);
+        }
+        else if (isWalled(1) && isWalled(2))
+            offset = 64 * 3;
+        else if (isWalled(2) && isWalled(4))
+        {
+            offset = 64 * 3;
+            tile.transform.Rotate(Vector3.forward, 270);
+        }
+        else if (isWalled(4) && isWalled(8))
+        {
+            offset = 64 * 3;
+            tile.transform.Rotate(Vector3.forward, 180);
+        }
+        else if (isWalled(8) && isWalled(1))
+        {
+            offset = 64 * 3;
+            tile.transform.Rotate(Vector3.forward, 90);
+        }
+
+        var spriteRenderer = tile.GetComponentInChildren<SpriteRenderer>();
+        if (spriteRenderer == null)
+            return;
+        
+        spriteRenderer.sprite = Sprite.Create(spriteRenderer.sprite.texture, new Rect(offset, 0, 64, 64), new Vector2(0.5f, 0.5f), 64 / TileSize.x);
+    }
+
+    private GameObject CreateTile(int x, int y, TileType[,] tiles)
     {
         var position = new Vector3(TileSize.x * x, TileSize.y * y);
+        var type = tiles[x, y];
+
         var tile = Instantiate(GetTilePrefab(type), position, Quaternion.identity) as GameObject;
+        
+        if (type == TileType.Wall)
+            SetWallTile(x, y, tiles, tile);
 
         if (tile == null)
-            return;
+            return null;
 
         tile.transform.parent = transform;
         DontSaveObject(tile);
         tile.name = string.Format("tile_{0}x{1}", x, y);
+
+        return tile;
     }
 
     private static void DontSaveObject(GameObject obj)
