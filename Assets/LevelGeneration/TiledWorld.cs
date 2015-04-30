@@ -111,6 +111,23 @@ public class TiledWorld : MonoBehaviour
         var isWalled = new Func<int, bool>(w => (neighbours & w) == w);
         if (neighbours == 0x0F) // 4 walls
             offset = 64 * 5;
+        else if (isWalled(1) && isWalled(2) && isWalled(4)) // 3 walls
+            offset = 64 * 4;
+        else if (isWalled(1) && isWalled(2) && isWalled(8))
+        {
+            offset = 64 * 4;
+            tile.transform.Rotate(Vector3.forward, 90);
+        }
+        else if (isWalled(1) && isWalled(4) && isWalled(8))
+        {
+            offset = 64 * 4;
+            tile.transform.Rotate(Vector3.forward, 180);
+        }
+        else if (isWalled(4) && isWalled(2) && isWalled(8))
+        {
+            offset = 64 * 4;
+            tile.transform.Rotate(Vector3.forward, 270);
+        }
         else if (isWalled(1) && isWalled(4)) // 2 walls
             offset = 64 * 2;
         else if (isWalled(2) && isWalled(8))
@@ -134,6 +151,23 @@ public class TiledWorld : MonoBehaviour
         {
             offset = 64 * 3;
             tile.transform.Rotate(Vector3.forward, 90);
+        }
+        else if (isWalled(1)) // 1 wall
+            offset = 64;
+        else if (isWalled(8))
+        {
+            offset = 64;
+            tile.transform.Rotate(Vector3.forward, 90);
+        }
+        else if (isWalled(4))
+        {
+            offset = 64;
+            tile.transform.Rotate(Vector3.forward, 180);
+        }
+        else if (isWalled(2))
+        {
+            offset = 64;
+            tile.transform.Rotate(Vector3.forward, 270);
         }
 
         var spriteRenderer = tile.GetComponentInChildren<SpriteRenderer>();
