@@ -88,6 +88,7 @@ GameObject:
   - 124: {fileID: 634623538}
   - 81: {fileID: 634623537}
   - 114: {fileID: 634623542}
+  - 114: {fileID: 634623543}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -128,8 +129,8 @@ Camera:
   m_GameObject: {fileID: 634623536}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: .192156866, g: .301960796, b: .474509805, a: .0196078438}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: .321568638, g: .321568608, b: .321568638, a: 1}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -140,7 +141,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 9
+  orthographic size: 4.53125
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -177,6 +178,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TrackingSpeed: 5
+--- !u!114 &634623543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 634623536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f017fd02ca13d944b39b153a7c3aa4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Scale: 1
+  TileSize: 64
 --- !u!1 &754954929
 GameObject:
   m_ObjectHideFlags: 0
@@ -358,6 +372,10 @@ Prefab:
       propertyPath: Generator
       value: 
       objectReference: {fileID: 754954932}
+    - target: {fileID: 11484612, guid: 2eadd78e0faf5894399de00c75521d73, type: 2}
+      propertyPath: InitialAmount
+      value: 40
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2eadd78e0faf5894399de00c75521d73, type: 2}
   m_RootGameObject: {fileID: 754954929}
@@ -401,6 +419,30 @@ Prefab:
     - target: {fileID: 423632, guid: f3701294304e8af4987520598331cabe, type: 2}
       propertyPath: m_RootOrder
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2023632, guid: f3701294304e8af4987520598331cabe, type: 2}
+      propertyPath: orthographic size
+      value: 4.53125
+      objectReference: {fileID: 0}
+    - target: {fileID: 2023632, guid: f3701294304e8af4987520598331cabe, type: 2}
+      propertyPath: m_BackGroundColor.r
+      value: .321568638
+      objectReference: {fileID: 0}
+    - target: {fileID: 2023632, guid: f3701294304e8af4987520598331cabe, type: 2}
+      propertyPath: m_BackGroundColor.g
+      value: .321568608
+      objectReference: {fileID: 0}
+    - target: {fileID: 2023632, guid: f3701294304e8af4987520598331cabe, type: 2}
+      propertyPath: m_BackGroundColor.b
+      value: .321568638
+      objectReference: {fileID: 0}
+    - target: {fileID: 2023632, guid: f3701294304e8af4987520598331cabe, type: 2}
+      propertyPath: m_BackGroundColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2023632, guid: f3701294304e8af4987520598331cabe, type: 2}
+      propertyPath: m_ClearFlags
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f3701294304e8af4987520598331cabe, type: 2}

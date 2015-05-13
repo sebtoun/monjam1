@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Serialization;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -222,7 +220,7 @@ public class TiledWorld : MonoBehaviour
 
     public Vector2 RandomPosition()
     {
-        return new Vector2(Random.value * TileWidth * TileSize.x, Random.value * TileHeight * TileSize.y);
+        return new Vector2((Random.value * TileWidth - 0.5f) * TileSize.x, (Random.value * TileHeight - 0.5f) * TileSize.y);
     }
 
     public bool SampleEmptyPosition(Vector2 AABB, out Vector2 position, int iterations = 5)

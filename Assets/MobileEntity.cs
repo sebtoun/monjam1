@@ -4,9 +4,10 @@ using System.Collections;
 [ExecutionOrder("Movement")]
 public class MobileEntity : MonoBehaviour 
 {
-    public float MinSpeed = 10;
-    public float MaxSpeed = 10;
-    public float Inertia = 0.1f;
+    public float BackwardSpeed = 6;
+    public float ForwardSpeed = 10;
+    public float InertiaTranslation = 0.1f;
+    public float InertiaRotation = 0.1f;
     public float VelocityGain = 8;
 
     [Range(0, 1)]
@@ -28,23 +29,23 @@ public class MobileEntity : MonoBehaviour
     void Start()
     {
         _body = GetComponentInChildren<Rigidbody2D>();
-        MinSpeed = MinSpeed * (1 + Random.value * ParametersRandomization);
-        MaxSpeed = MaxSpeed * (1 + Random.value * ParametersRandomization);
-        Inertia = Inertia * (1 + Random.value * ParametersRandomization);
+        BackwardSpeed = BackwardSpeed * (1 + Random.value * ParametersRandomization);
+        ForwardSpeed = ForwardSpeed * (1 + Random.value * ParametersRandomization);
+        InertiaTranslation = InertiaTranslation * (1 + Random.value * ParametersRandomization);
+        InertiaRotation = InertiaRotation * (1 + Random.value * ParametersRandomization);
         VelocityGain = VelocityGain * (1 + Random.value * ParametersRandomization);
     }
 
     void Update()
     {
-        var actualSpeed = Mathf.Lerp( MinSpeed, MaxSpeed, 0.5f * ( Vector2.Dot( transform.up, TargetVelocity ) + 1 ) );
+        var actualSpeed = Mathf.Lerp( BackwardSpeed, ForwardSpeed, 0.5f * ( Vector2.Dot( transform.up, TargetVelocity ) + 1 ) );
 
-        _currentVelocity = Vector2.SmoothDamp( _currentVelocity, TargetVelocity * actualSpeed, ref _currentAcceleration, Inertia );
-        _currentAngle = Mathf.SmoothDampAngle( _currentAngle, TargetAngle, ref _angularVelocity, Inertia );
+        _currentVelocity = Vector2.SmoothDamp( _currentVelocity, TargetVelocity * actualSpeed, ref _currentAcceleration, InertiaTranslation );
+        _currentAngle = Mathf.SmoothDampAngle( _currentAngle, TargetAngle, ref _angularVelocity, InertiaRotation );
     }
 
     void FixedUpdate()
     {
-        // _body.velocity = _currentVelocity;
         _body.AddForce( (_currentVelocity - _body.velocity) * VelocityGain, ForceMode2D.Force );
         _body.MoveRotation( _currentAngle );
     }
