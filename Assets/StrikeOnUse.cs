@@ -40,7 +40,7 @@ public class StrikeOnUse : MonoBehaviour
         var strikePos = entity.transform.position + StrikeDistance * strikeDirection;
         foreach (var col in Physics2D.OverlapCircleAll(strikePos, StrikeRadius, HitMask))
         {
-            col.GetComponentInParent<Rigidbody2D>().AddForce( strikeDirection * StrikePower, ForceMode2D.Impulse );
+            col.GetComponentInParent<Rigidbody2D>().SendMessage( "Hit", strikeDirection * StrikePower );            
         }
          
         yield return new WaitForSeconds(RecoveryDuration);

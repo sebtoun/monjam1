@@ -74,9 +74,9 @@ MonoBehaviour:
   RaiseDuration: .100000001
   RecoveryDuration: .300000012
   RelativeDirection: {x: 0, y: 1}
-  StrikeDistance: 1
-  StrikePower: 50
-  StrikeRadius: .5
+  StrikeDistance: .5
+  StrikePower: 10
+  StrikeRadius: 1
 --- !u!212 &21285774
 SpriteRenderer:
   m_ObjectHideFlags: 1

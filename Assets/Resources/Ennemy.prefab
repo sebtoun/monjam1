@@ -10,7 +10,7 @@ GameObject:
   - 4: {fileID: 418734}
   - 212: {fileID: 21218738}
   - 114: {fileID: 11418738}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Skin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26,7 +26,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 418736}
   - 212: {fileID: 21218740}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Skin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42,7 +42,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 418738}
   - 114: {fileID: 11418740}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58,7 +58,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 476874}
   - 58: {fileID: 5876874}
-  m_Layer: 2
+  m_Layer: 11
   m_Name: Sight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -77,6 +77,8 @@ GameObject:
   - 114: {fileID: 11456110}
   - 114: {fileID: 11476874}
   - 114: {fileID: 11471714}
+  - 95: {fileID: 9535404}
+  - 114: {fileID: 11418066}
   m_Layer: 9
   m_Name: Ennemy
   m_TagString: Enemy
@@ -184,8 +186,8 @@ Rigidbody2D:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 179820}
   m_Mass: 1
-  m_LinearDrag: 2
-  m_AngularDrag: 2
+  m_LinearDrag: 3
+  m_AngularDrag: 3
   m_GravityScale: 0
   m_FixedAngle: 0
   m_IsKinematic: 0
@@ -214,6 +216,33 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_Radius: 5
   m_Center: {x: 0, y: 0}
+--- !u!95 &9535404
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 179820}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 2a8fc535e0f83644eb1381e57fdce961, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11418066
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 179820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 398b0ac4436d08f4e8f2b9d114d22930, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StandUpDelay: 1.10000002
 --- !u!114 &11418738
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -251,9 +280,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e68628ecf0a31542bfef025d68dab24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinSpeed: 4
-  MaxSpeed: 7
-  Inertia: .200000003
+  BackwardSpeed: 6
+  ForwardSpeed: 10
+  InertiaTranslation: .100000001
+  InertiaRotation: .100000001
   VelocityGain: 6
   ParametersRandomization: .194999993
   TargetVelocity: {x: 0, y: 0}

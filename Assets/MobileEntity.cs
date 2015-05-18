@@ -25,9 +25,11 @@ public class MobileEntity : MonoBehaviour
     public Vector2 TargetVelocity;
     [HideInInspector]
     public float TargetAngle;
-    
+
+    private Animator _state;
     void Start()
     {
+        _state = GetComponent<Animator>();
         _body = GetComponentInChildren<Rigidbody2D>();
         BackwardSpeed = BackwardSpeed * (1 + Random.value * ParametersRandomization);
         ForwardSpeed = ForwardSpeed * (1 + Random.value * ParametersRandomization);
@@ -46,7 +48,12 @@ public class MobileEntity : MonoBehaviour
 
     void FixedUpdate()
     {
-        _body.AddForce( (_currentVelocity - _body.velocity) * VelocityGain, ForceMode2D.Force );
+        if (_state != null && _state.GetCurrentAnimatorStateInfo(0).IsName("Inert"))
+        {
+            return;
+        }
+        _body.MovePosition( _body.position + _currentVelocity * Time.fixedDeltaTime );
+        //_body.AddForce( (_currentVelocity - _body.velocity) * VelocityGain, ForceMode2D.Force );
         _body.MoveRotation( _currentAngle );
     }
 }

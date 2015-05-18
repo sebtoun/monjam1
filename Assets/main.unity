@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EnemyPrefab: {fileID: 179820, guid: eca7b191c23df4a40bac172f634e13e8, type: 2}
-  InitialAmount: 40
+  InitialAmount: 20
 --- !u!114 &754954934
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -374,7 +374,7 @@ Prefab:
       objectReference: {fileID: 754954932}
     - target: {fileID: 11484612, guid: 2eadd78e0faf5894399de00c75521d73, type: 2}
       propertyPath: InitialAmount
-      value: 40
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2eadd78e0faf5894399de00c75521d73, type: 2}
