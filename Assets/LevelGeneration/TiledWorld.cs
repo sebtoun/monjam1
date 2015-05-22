@@ -99,6 +99,10 @@ public class TiledWorld : MonoBehaviour
 
     private void SetWallTile(int x, int y, TileType[,] tiles, GameObject tile)
     {
+        var spriteRenderer = tile.GetComponentInChildren<SpriteRenderer>();
+        if (spriteRenderer == null)
+            return;
+
         var offset = 0;
         var neighbours = 0;
         if (y < TileHeight - 1 && tiles[x, y + 1] == TileType.Floor) neighbours |= 1;
@@ -106,73 +110,87 @@ public class TiledWorld : MonoBehaviour
         if (y > 0 && tiles[x, y - 1] == TileType.Floor) neighbours |= 4;
         if (x > 0 && tiles[x - 1, y] == TileType.Floor) neighbours |= 8;
 
-        var isWalled = new Func<int, bool>(w => (neighbours & w) == w);
+        Func<int, bool> isFloor = (w => (neighbours & w) == w);
         if (neighbours == 0x0F) // 4 walls
             offset = 64 * 5;
-        else if (isWalled(1) && isWalled(2) && isWalled(4)) // 3 walls
+        else if (isFloor(1) && isFloor(2) && isFloor(4)) // 3 walls
             offset = 64 * 4;
-        else if (isWalled(1) && isWalled(2) && isWalled(8))
+        else if (isFloor(1) && isFloor(2) && isFloor(8))
         {
             offset = 64 * 4;
             tile.transform.Rotate(Vector3.forward, 90);
         }
-        else if (isWalled(1) && isWalled(4) && isWalled(8))
+        else if (isFloor(1) && isFloor(4) && isFloor(8))
         {
             offset = 64 * 4;
             tile.transform.Rotate(Vector3.forward, 180);
         }
-        else if (isWalled(4) && isWalled(2) && isWalled(8))
+        else if (isFloor(4) && isFloor(2) && isFloor(8))
         {
             offset = 64 * 4;
             tile.transform.Rotate(Vector3.forward, 270);
         }
-        else if (isWalled(1) && isWalled(4)) // 2 walls
+        else if (isFloor(1) && isFloor(4)) // 2 walls
             offset = 64 * 2;
-        else if (isWalled(2) && isWalled(8))
+        else if (isFloor(2) && isFloor(8))
         {
             offset = 64 * 2;
             tile.transform.Rotate(Vector3.forward, 90);
         }
-        else if (isWalled(1) && isWalled(2))
+        else if (isFloor(1) && isFloor(2))
             offset = 64 * 3;
-        else if (isWalled(2) && isWalled(4))
+        else if (isFloor(2) && isFloor(4))
         {
             offset = 64 * 3;
             tile.transform.Rotate(Vector3.forward, 270);
         }
-        else if (isWalled(4) && isWalled(8))
+        else if (isFloor(4) && isFloor(8))
         {
             offset = 64 * 3;
             tile.transform.Rotate(Vector3.forward, 180);
         }
-        else if (isWalled(8) && isWalled(1))
+        else if (isFloor(8) && isFloor(1))
         {
             offset = 64 * 3;
             tile.transform.Rotate(Vector3.forward, 90);
         }
-        else if (isWalled(1)) // 1 wall
+        else if (isFloor(1)) // 1 wall
             offset = 64;
-        else if (isWalled(8))
+        else if (isFloor(8))
         {
             offset = 64;
             tile.transform.Rotate(Vector3.forward, 90);
         }
-        else if (isWalled(4))
+        else if (isFloor(4))
         {
             offset = 64;
             tile.transform.Rotate(Vector3.forward, 180);
         }
-        else if (isWalled(2))
+        else if (isFloor(2))
         {
             offset = 64;
             tile.transform.Rotate(Vector3.forward, 270);
         }
 
-        var spriteRenderer = tile.GetComponentInChildren<SpriteRenderer>();
-        if (spriteRenderer == null)
-            return;
-        
-        spriteRenderer.sprite = Sprite.Create(spriteRenderer.sprite.texture, new Rect(offset, 0, 64, 64), new Vector2(0.5f, 0.5f), 64 / TileSize.x);
+        var texture = spriteRenderer.sprite.texture;
+
+        // CORNERS
+        if (!isFloor(8) && !isFloor(1) && x > 0 && y < TileHeight - 1 && _tiles[x - 1, y + 1] == TileType.Floor) SetCorner("TopLeftCorner", tile, texture, 0);
+        if (!isFloor(1) && !isFloor(2) && x < TileWidth - 1 && y < TileHeight - 1 && _tiles[x + 1, y + 1] == TileType.Floor) SetCorner("TopRightCorner", tile, texture, 270);
+        if (!isFloor(2) && !isFloor(4) && x < TileWidth - 1 && y > 0 && _tiles[x + 1, y - 1] == TileType.Floor) SetCorner("DownRightCorner", tile, texture, 180);
+        if (!isFloor(4) && !isFloor(8) && x > 0 && y > 0 && _tiles[x - 1, y - 1] == TileType.Floor) SetCorner("DownLeftCorner", tile, texture, 90);
+
+        spriteRenderer.sprite = Sprite.Create(texture, new Rect(offset, 0, 64, 64), new Vector2(0.5f, 0.5f), 64 / TileSize.x);
+    }
+
+    private void SetCorner(string cornerName, GameObject tile, Texture2D texture, float rotation)
+    {
+        var corner = new GameObject(cornerName);
+        var spriteRenderer = corner.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = Sprite.Create(texture,new Rect(64 * 6, 0, 64, 64), new Vector2(0.5f, 0.5f), 64 / TileSize.x);
+        spriteRenderer.sortingOrder++;
+        corner.transform.SetParent(tile.transform, false);
+        corner.transform.rotation = Quaternion.AngleAxis(rotation, Vector3.forward);
     }
 
     private GameObject CreateTile(int x, int y, TileType[,] tiles)
